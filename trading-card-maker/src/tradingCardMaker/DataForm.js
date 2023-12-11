@@ -1,5 +1,7 @@
 import React, { useState, useRef } from 'react';
 import html2canvas from 'html2canvas';
+import './DownloadButton.css';
+import './DataForm.css';
 import '../App.css';
 
 function DataForm(){
@@ -26,8 +28,13 @@ function DataForm(){
       link.click();
     });
   };
+  
   return(
     <div class = "form">
+      <div class="upload-btn-wrapper">
+        <button class="btn">Upload a file</button>
+        <input type="file" name="myfile" onChange={handleImageChange} />
+      </div>
       <input type="file" onChange={handleImageChange} />
       <input 
         className="input"
@@ -42,6 +49,9 @@ function DataForm(){
         {/* {/* Add your template image or style here /} */}
       </div>
       <button onClick={downloadCard}>Download Card</button>
+      <button type="button" data-dl>
+	<span class="dl-icon"></span><span>&#x44;&#x6F;&#x77;&#x6E;&#x6C;&#x6F;&#x61;&#x64;</span>
+</button>
     </div>
   );
 }
