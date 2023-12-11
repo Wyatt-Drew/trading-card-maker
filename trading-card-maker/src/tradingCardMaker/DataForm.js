@@ -4,7 +4,7 @@ import './DownloadButton.css';
 import './DataForm.css';
 import '../App.css';
 
-function DataForm(){
+function DataForm() {
   const [image, setImage] = useState(null);
   const [text, setText] = useState("");
   const cardRef = useRef(null);
@@ -28,31 +28,81 @@ function DataForm(){
       link.click();
     });
   };
-  
-  return(
-    <div class = "form">
-      <div class="upload-btn-wrapper">
-        <button class="btn">Upload a file</button>
+
+  const handleDownloadClick = () => {
+    let dlClass = "dl-working";
+    let button = document.querySelector("[data-dl]");
+
+    if (!button.classList.contains(dlClass)) {
+      let lastSpan = button.querySelector("span:last-child");
+      let lastSpanText = lastSpan.textContent;
+      let timeout = getMSFromProperty("--dur", ":root");
+
+      button.classList.add(dlClass);
+      lastSpan.textContent = "Downloading…";
+      button.disabled = true;
+
+      setTimeout(() => {
+        lastSpan.textContent = "Completed!";
+      }, timeout * 0.9);
+
+      setTimeout(() => {
+        button.classList.remove(dlClass);
+        lastSpan.textContent = lastSpanText;
+        button.disabled = false;
+      }, timeout + 1000);
+    }
+  };
+
+  const getMSFromProperty = (property, selector) => {
+    let cs = window.getComputedStyle(document.querySelector(selector));
+    let transDur = cs.getPropertyValue(property);
+    let msLabelPos = transDur.indexOf("ms");
+    let sLabelPos = transDur.indexOf("s");
+
+    if (msLabelPos > -1) return transDur.substr(0, msLabelPos);
+    else if (sLabelPos > -1) return transDur.substr(0, sLabelPos) * 1000;
+  };
+
+  return (
+    <div className="form">
+      <div className="upload-btn-wrapper">
+        <button className="btn">Upload a file</button>
         <input type="file" name="myfile" onChange={handleImageChange} />
       </div>
       <input type="file" onChange={handleImageChange} />
-      <input 
+      <input
         className="input"
-        type="text" 
-        placeholder="Enter Text" 
-        value={text} 
-        onChange={(e) => setText(e.target.value)} 
+        type="text"
+        placeholder="Enter Text"
+        value={text}
+        onChange={(e) => setText(e.target.value)}
       />
-        <div ref={cardRef} style={{ position: 'relative' }}>
-        {image && <img src={image} alt="Uploaded" style={{ width: '300px', height: '400px' }} />}
-        <p style={{ position: 'absolute', bottom: 10, left: 10, color: 'white' }}>{text}</p>
-        {/* {/* Add your template image or style here /} */}
+      <div ref={cardRef} style={{ position: 'relative' }}>
+        {image && (
+          <img
+            src={image}
+            alt="Uploaded"
+            style={{ width: '300px', height: '400px' }}
+          />
+        )}
+        <p
+          style={{
+            position: 'absolute',
+            bottom: 10,
+            left: 10,
+            color: 'white',
+          }}
+        >
+          {text}
+        </p>
       </div>
-      <button onClick={downloadCard}>Download Card</button>
-      <button type="button" data-dl>
-	<span class="dl-icon"></span><span>&#x44;&#x6F;&#x77;&#x6E;&#x6C;&#x6F;&#x61;&#x64;</span>
-</button>
+      <button type="button" data-dl onClick={handleDownloadClick}>
+        <span className="dl-icon"></span>
+        <span>&#x44;&#x6F;&#x77;&#x6E;&#x6C;&#x6F;&#x61;&#x64;</span>
+      </button>
     </div>
   );
 }
+
 export default DataForm;

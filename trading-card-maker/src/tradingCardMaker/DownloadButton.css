@@ -20,6 +20,7 @@ body {
 	overflow: hidden;
 }
 button {
+	font-size: 0.7em;
 	background: #255ff4;
 	border-radius: 0.2em;
 	color: #fff;
