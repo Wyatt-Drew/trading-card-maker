@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect} from 'react';
 import html2canvas from 'html2canvas';
 import './DownloadButton.css';
 import './DataForm.css';
@@ -11,6 +11,18 @@ function DataForm() {
   const [text, setText] = useState("");
   const cardRef = useRef(null);
 
+  useEffect(() => {
+    // Load and draw the background image when the component mounts
+    const card = cardRef.current;
+    const context = card.getContext('2d');
+
+    const bgImg = new Image();
+    bgImg.src = backgroundImg;
+    bgImg.onload = () => {
+      context.drawImage(bgImg, 0, 0, card.width, card.height);
+    };
+  }, []);
+
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     const reader = new FileReader();
@@ -22,20 +34,7 @@ function DataForm() {
     if (file) {
       reader.readAsDataURL(file);
     }
-  };
 
-  const handleOverlayImageChange = (e) => {
-    const file = e.target.files[0];
-    const reader = new FileReader();
-
-    reader.onloadend = () => {
-      setOverlayImage(reader.result);
-      drawImages(); // Redraw when overlay image changes
-    };
-
-    if (file) {
-      reader.readAsDataURL(file);
-    }
   };
 
   const drawImages = () => {
@@ -55,17 +54,6 @@ function DataForm() {
       img.src = image;
       img.onload = () => {
         context.drawImage(img, 0, 0, card.width, card.height);
-      };
-    }
-
-    // Draw the overlay image with an overlay effect (adjust as needed)
-    if (overlayImage) {
-      const overlayImg = new Image();
-      overlayImg.src = overlayImage;
-      overlayImg.onload = () => {
-        context.globalAlpha = 0.5; // Set overlay transparency (adjust as needed)
-        context.drawImage(overlayImg, 0, 0, card.width, card.height);
-        context.globalAlpha = 1; // Reset global alpha
       };
     }
   };
@@ -124,15 +112,16 @@ function DataForm() {
   return (
     <div className="container">
       <div className="card">
-        <canvas ref={cardRef} width={300} height={400}></canvas>
+        <canvas ref={cardRef} width={300} height={400}>
+        </canvas>
         <div className="cardImage">
           {image && <img src={image} alt="Main Image" />}
           <p className="cardText">{text}</p>
         </div>
+
       </div>
       <div className="form">
         <input type="file" onChange={handleImageChange} />
-        <input type="file" onChange={handleOverlayImageChange} />
         <input
           className="input"
           type="text"
