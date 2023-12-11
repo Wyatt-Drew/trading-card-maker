@@ -6,6 +6,7 @@ import '../App.css';
 
 function DataForm() {
   const [image, setImage] = useState(null);
+  const [overlayImage, setOverlayImage] = useState(null);
   const [text, setText] = useState("");
   const cardRef = useRef(null);
 
@@ -52,6 +53,12 @@ function DataForm() {
         button.disabled = false;
       }, timeout + 1000);
     }
+    html2canvas(cardRef.current).then((canvas) => {
+      const link = document.createElement("a");
+      link.download = "trading-card.png";
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    });
   };
 
   const getMSFromProperty = (property, selector) => {
@@ -65,43 +72,23 @@ function DataForm() {
   };
 
   return (
-    <div className="form">
-      <div className="upload-btn-wrapper">
-        <button className="btn">Upload a file</button>
-        <input type="file" name="myfile" onChange={handleImageChange} />
+    <div className = "container">
+      <div className = "card">
+        <div className = "cardImage" ref={cardRef}> {image && (<img src={image} />)}
+          <p className = "cardText"> {text}</p>
+        </div>
       </div>
-      <input type="file" onChange={handleImageChange} />
-      <input
-        className="input"
-        type="text"
-        placeholder="Enter Text"
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-      />
-      <div ref={cardRef} style={{ position: 'relative' }}>
-        {image && (
-          <img
-            src={image}
-            alt="Uploaded"
-            style={{ width: '300px', height: '400px' }}
-          />
-        )}
-        <p
-          style={{
-            position: 'absolute',
-            bottom: 10,
-            left: 10,
-            color: 'white',
-          }}
-        >
-          {text}
-        </p>
+      <div className="form">
+        <input type="file" onChange={handleImageChange} />
+        <input className="input" type="text" placeholder="Enter Text" value={text} onChange={(e) => setText(e.target.value)}/>
+
+        <button type="button" data-dl onClick={handleDownloadClick}>
+          <span className="dl-icon"></span>
+          <span>&#x44;&#x6F;&#x77;&#x6E;&#x6C;&#x6F;&#x61;&#x64;</span>
+        </button>
       </div>
-      <button type="button" data-dl onClick={handleDownloadClick}>
-        <span className="dl-icon"></span>
-        <span>&#x44;&#x6F;&#x77;&#x6E;&#x6C;&#x6F;&#x61;&#x64;</span>
-      </button>
     </div>
+    
   );
 }
 
