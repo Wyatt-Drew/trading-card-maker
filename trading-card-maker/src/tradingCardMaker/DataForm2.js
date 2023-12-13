@@ -83,14 +83,14 @@ const DataForm = () => {
             const bgImg = new Image();
             bgImg.src = backgroundImg;
             bgImg.onload = () => {
-              context.drawImage(bgImg, 0, 0, card.width, card.height);
+              context.drawImage(bgImg, 0 + position.x, 0 + position.y, card.width + position.x, card.height + position.y);
             };
           } catch (error) {
             console.error("Error loading images", error);
           }
         };
         loadImagesInOrder();
-      }, [backgroundImg, image]);
+      }, [backgroundImg, image, position.y, position.x]);
     
     const handleDownloadClick = () => {
         html2canvas(cardRef.current).then((canvas) => {
