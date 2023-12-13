@@ -10,6 +10,34 @@ const DataForm = () => {
     const cardRef = useRef(null);
     const fileInputRef = useRef(null);
     const [text, setText] = useState("");
+    const [isDragging, setIsDragging] = useState(false);
+    const [position, setPosition] = useState({ x: 0, y: 0 });
+
+    const startDrag = (e) => {
+      setIsDragging(true);
+      updatePosition(e);
+  };
+
+  const drag = (e) => {
+      if (isDragging) {
+          updatePosition(e);
+      }
+  };
+
+  const endDrag = () => {
+      setIsDragging(false);
+  };
+
+  const updatePosition = (e) => {
+      if (cardRef.current) {
+          const rect = cardRef.current.getBoundingClientRect();
+          setPosition({
+              x: e.clientX - rect.left,
+              y: e.clientY - rect.top
+          });
+      }
+  };
+
 
     const handleImageUpload = (e) => {
       const file = e.target.files[0];
@@ -75,8 +103,18 @@ const DataForm = () => {
 
     return (
         <div className="container">
-            <div className="card" >
-                <canvas ref={cardRef}/>
+            <div className="card" 
+                onMouseDown={startDrag} 
+                onMouseMove={drag} 
+                onMouseUp={endDrag} 
+                onMouseLeave={endDrag}>
+
+                <canvas ref={cardRef} />
+                {isDragging && (
+                    <div>
+                        Dragging at X: {position.x}, Y: {position.y}
+                    </div>
+                )}
             </div>
             <div className="form">
                 <input type="file" ref={fileInputRef} style={{ display: 'none' }} onChange={handleImageUpload}/>
