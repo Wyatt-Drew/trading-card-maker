@@ -60,11 +60,11 @@ const DataForm = () => {
           reader.onload = (e) => {
               const img = new Image();
               img.onload = () => {
-                  const canvas = cardRef.current;
-                  canvas.width = img.width;
-                  canvas.height = img.height;
-                  const ctx = canvas.getContext('2d');
-                  ctx.drawImage(img, canvas.width/4, canvas.height/4, canvas.width/2, canvas.height/2);
+                  const card = cardRef.current;
+                  card.width = img.width;
+                  card.height = img.height;
+                  const ctx = card.getContext('2d');
+                  ctx.drawImage(img, 0 + position.x, 0 + position.y, (card.width + position.x)*scale, (card.height + position.y)*scale);
               };
               img.src = e.target.result;
               setImage(img);
@@ -108,7 +108,7 @@ const DataForm = () => {
           }
         };
         loadImagesInOrder();
-      }, [backgroundImg, image, position.y, position.x]);
+      }, [backgroundImg, image, position.y, position.x, scale]);
     
     const handleDownloadClick = () => {
         html2canvas(cardRef.current).then((canvas) => {
