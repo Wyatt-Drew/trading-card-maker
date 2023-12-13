@@ -11,6 +11,29 @@ const DataForm = () => {
     const fileInputRef = useRef(null);
     const [text, setText] = useState("");
 
+    const handleImageUpload = (e) => {
+      const file = e.target.files[0];
+      if (file && file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+              const img = new Image();
+              img.onload = () => {
+                  const canvas = cardRef.current;
+                  canvas.width = img.width;
+                  canvas.height = img.height;
+                  const ctx = canvas.getContext('2d');
+                  ctx.drawImage(img, canvas.width/4, canvas.height/4, canvas.width/2, canvas.height/2);
+              };
+              img.src = e.target.result;
+              setImage(img);
+          };
+          reader.readAsDataURL(file);
+      }
+  };
+  const handleFileInputClick = () => {
+      fileInputRef.current.click();
+  };
+
     useEffect(() => {
         // Function to load an image
         const loadImage = (src) => {
@@ -41,31 +64,6 @@ const DataForm = () => {
         loadImagesInOrder();
       }, [backgroundImg, image]);
     
-
-
-    const handleImageUpload = (e) => {
-        const file = e.target.files[0];
-        if (file && file.type.startsWith('image/')) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const img = new Image();
-                img.onload = () => {
-                    const canvas = cardRef.current;
-                    canvas.width = img.width;
-                    canvas.height = img.height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0);
-                };
-                img.src = e.target.result;
-                setImage(img);
-            };
-            reader.readAsDataURL(file);
-        }
-    };
-
-    const handleFileInputClick = () => {
-        fileInputRef.current.click();
-    };
     const handleDownloadClick = () => {
         html2canvas(cardRef.current).then((canvas) => {
           const link = document.createElement("a");
