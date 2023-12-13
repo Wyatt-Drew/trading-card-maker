@@ -91,13 +91,18 @@ const DataForm = () => {
           const card = cardRef.current;
           const context = card.getContext('2d');
           try {
+            if (image) {
+              context.drawImage(image, 0 + position.x, 0 + position.y, (card.width + position.x)*scale, (card.height + position.y)*scale);
+          } else {
+              console.log("Image not loaded yet");
+          }
             await loadImage(backgroundImg);
             // Draw background image on the canvas here
             // Set the state to true when both images are loaded
             const bgImg = new Image();
             bgImg.src = backgroundImg;
             bgImg.onload = () => {
-              context.drawImage(bgImg, 0 + position.x, 0 + position.y, (card.width + position.x)*scale, (card.height + position.y)*scale);
+              context.drawImage(bgImg, 0, 0, card.width, card.height);
             };
           } catch (error) {
             console.error("Error loading images", error);
@@ -129,11 +134,6 @@ const DataForm = () => {
                 onMouseLeave={endDrag}>
 
                 <canvas ref={cardRef} />
-                {isDragging && (
-                    <div>
-                        Dragging at X: {position.x}, Y: {position.y}
-                    </div>
-                )}
             </div>
             <div className="form">
                 <input type="file" ref={fileInputRef} style={{ display: 'none' }} onChange={handleImageUpload}/>
