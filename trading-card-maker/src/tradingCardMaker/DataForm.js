@@ -4,12 +4,54 @@ import html2canvas from 'html2canvas';
 import './DownloadButton.css';
 import './DataForm.css';
 import '../App.css';
+import ReactScrollWheelHandler from 'react-scroll-wheel-handler';
 
 const DataForm = () => {
     const [image, setImage] = useState(null);
     const cardRef = useRef(null);
     const fileInputRef = useRef(null);
     const [text, setText] = useState("");
+    const [isDragging, setIsDragging] = useState(false);
+    const [position, setPosition] = useState({ x: 0, y: 0 });
+    const [scale, setScale] = useState(1);
+
+    // Function to increment 'scale'
+    const handleScrollUp = () => {
+      setScale(prevScale => prevScale + 0.1);
+      console.log(scale);
+    };
+  
+    // Function to decrement 'scale'
+    const handleScrollDown = () => {
+      setScale(prevScale => prevScale - 0.1);
+      console.log(scale);
+    };
+    
+    const startDrag = (e) => {
+      setIsDragging(true);
+      updatePosition(e);
+  };
+
+  const drag = (e) => {
+      if (isDragging) {
+          updatePosition(e);
+      }
+  };
+
+  const endDrag = () => {
+      setIsDragging(false);
+  };
+
+  const updatePosition = (e) => {
+      if (cardRef.current) {
+          const rect = cardRef.current.getBoundingClientRect();
+          setPosition({
+              x: e.clientX - rect.left,
+              y: e.clientY - rect.top
+          });
+      }
+  };
+
 
     const handleImageUpload = (e) => {
       const file = e.target.files[0];
@@ -49,6 +91,10 @@ const DataForm = () => {
           const card = cardRef.current;
           const context = card.getContext('2d');
           try {
+            context.clearRect(0, 0, card.width, card.height);
+            if (image) {
+              context.drawImage(image, 0 + position.x, 0 + position.y, (card.width + position.x)*scale, (card.height + position.y)*scale);
+            } 
             await loadImage(backgroundImg);
             // Draw background image on the canvas here
             // Set the state to true when both images are loaded
@@ -62,7 +108,7 @@ const DataForm = () => {
           }
         };
         loadImagesInOrder();
-      }, [backgroundImg, image]);
+      }, [backgroundImg, image, position.y, position.x]);
     
     const handleDownloadClick = () => {
         html2canvas(cardRef.current).then((canvas) => {
@@ -74,9 +120,19 @@ const DataForm = () => {
       };
 
     return (
+      <ReactScrollWheelHandler
+      upHandler={handleScrollUp}
+      downHandler={handleScrollDown}>
         <div className="container">
-            <div className="card" >
-                <canvas ref={cardRef}/>
+
+        
+            <div className="card" 
+                onMouseDown={startDrag} 
+                onMouseMove={drag} 
+                onMouseUp={endDrag} 
+                onMouseLeave={endDrag}>
+
+                <canvas ref={cardRef} />
             </div>
             <div className="form">
                 <input type="file" ref={fileInputRef} style={{ display: 'none' }} onChange={handleImageUpload}/>
@@ -87,7 +143,9 @@ const DataForm = () => {
                     <span>&#x44;&#x6F;&#x77;&#x6E;&#x6C;&#x6F;&#x61;&#x64;</span>
                 </button>
             </div>
+
         </div>
+        </ReactScrollWheelHandler>
     );
 };
 
