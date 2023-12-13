@@ -4,6 +4,7 @@ import html2canvas from 'html2canvas';
 import './DownloadButton.css';
 import './DataForm.css';
 import '../App.css';
+import ReactScrollWheelHandler from 'react-scroll-wheel-handler';
 
 const DataForm = () => {
     const [image, setImage] = useState(null);
@@ -12,7 +13,20 @@ const DataForm = () => {
     const [text, setText] = useState("");
     const [isDragging, setIsDragging] = useState(false);
     const [position, setPosition] = useState({ x: 0, y: 0 });
+    const [scale, setScale] = useState(1);
 
+    // Function to increment 'scale'
+    const handleScrollUp = () => {
+      setScale(prevScale => prevScale + 0.1);
+      console.log(scale);
+    };
+  
+    // Function to decrement 'scale'
+    const handleScrollDown = () => {
+      setScale(prevScale => prevScale - 0.1);
+      console.log(scale);
+    };
+    
     const startDrag = (e) => {
       setIsDragging(true);
       updatePosition(e);
@@ -83,7 +97,7 @@ const DataForm = () => {
             const bgImg = new Image();
             bgImg.src = backgroundImg;
             bgImg.onload = () => {
-              context.drawImage(bgImg, 0 + position.x, 0 + position.y, card.width + position.x, card.height + position.y);
+              context.drawImage(bgImg, 0 + position.x, 0 + position.y, (card.width + position.x)*scale, (card.height + position.y)*scale);
             };
           } catch (error) {
             console.error("Error loading images", error);
@@ -102,7 +116,12 @@ const DataForm = () => {
       };
 
     return (
+      <ReactScrollWheelHandler
+      upHandler={handleScrollUp}
+      downHandler={handleScrollDown}>
         <div className="container">
+
+        
             <div className="card" 
                 onMouseDown={startDrag} 
                 onMouseMove={drag} 
@@ -125,7 +144,9 @@ const DataForm = () => {
                     <span>&#x44;&#x6F;&#x77;&#x6E;&#x6C;&#x6F;&#x61;&#x64;</span>
                 </button>
             </div>
+
         </div>
+        </ReactScrollWheelHandler>
     );
 };
 
