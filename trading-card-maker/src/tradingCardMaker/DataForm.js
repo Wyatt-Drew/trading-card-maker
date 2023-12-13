@@ -13,84 +13,42 @@ function DataForm() {
   const cardRef = useRef(null);
 
   useEffect(() => {
-    // Load and draw the background image when the component mounts
-    const card = cardRef.current;
-    const context = card.getContext('2d');
-
-    const bgImg = new Image();
-    bgImg.src = backgroundImg;
-    bgImg.onload = () => {
-      context.drawImage(bgImg, 0, 0, card.width, card.height);
-    };
-  }, []);
-  useEffect(() => {
-    // Load and draw the background image when the component mounts
-    const card = cardRef.current;
-    const context = card.getContext('2d');
-
-    const cardImg = new Image();
-    cardImg.src = cardImage;
-    cardImg.onload = () => {
-      context.drawImage(cardImg, 0, 0, card.width, card.height);
-    };
-    setBackgroundImage();
-  }, [image]);
-  const setCardImage = () => {
-
-  }
-  //Name: setBackgroundImage
-  //Purpose: This applies a background image to the entire card.
-  //Requirement: The background should have a transparent area for the card image to show through.
-  const setBackgroundImage = () => {
-    const card = cardRef.current;
-    const context = card.getContext('2d');
-    const bgImg = new Image();
-    bgImg.src = backgroundImg;
-    bgImg.onload = () => {
-      context.drawImage(bgImg, 0, 0, card.width, card.height);
-    };
-  }
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    const reader = new FileReader();
-
-    reader.onloadend = () => {
-      setImage(reader.result);
-    };
-
-    if (file) {
-      reader.readAsDataURL(file);
-    }
-    drawImages();
-  };
-
-  const drawImages = () => {
-    const card = cardRef.current;
-    const context = card.getContext('2d');
-  
-    // Draw the background image
-    const bgImg = new Image();
-    bgImg.src = backgroundImg;
-    bgImg.onload = () => {
-      context.drawImage(bgImg, 0, 0, card.width, card.height);
-  
-      // Draw the main image
-      if (image) {
+    // Function to load an image
+    const loadImage = (src) => {
+      return new Promise((resolve, reject) => {
         const img = new Image();
-        img.src = image;
-        img.onload = () => {
-          context.drawImage(img, 10, 10, 20, 20);
-          
-          // Draw the text
-          if (text) {
-            context.fillStyle = 'black'; // Set text color
-            context.font = '20px Arial'; // Set font properties
-            context.fillText(text, 10, 390); // Adjust position and size as needed
-          }
+        img.src = src;
+        img.onload = resolve;
+        img.onerror = reject;
+      });
+    };
+    // Load the images in sequence
+    const loadImagesInOrder = async () => {
+      const card = cardRef.current;
+      const context = card.getContext('2d');
+      try {
+        await loadImage(cardImage);
+        // Draw card image on the canvas here
+        const cardImg = new Image();
+        cardImg.src = cardImage;
+        cardImg.onload = () => {
+          context.drawImage(cardImg, 0, 0, card.width, card.height);
         };
+        await loadImage(backgroundImg);
+        // Draw background image on the canvas here
+        // Set the state to true when both images are loaded
+        const bgImg = new Image();
+        bgImg.src = backgroundImg;
+        bgImg.onload = () => {
+          context.drawImage(bgImg, 0, 0, card.width, card.height);
+        };
+      } catch (error) {
+        console.error("Error loading images", error);
       }
     };
-  };
+    loadImagesInOrder();
+  }, [cardImage, backgroundImg]);
+
   const handleDownloadClick = () => {
     html2canvas(cardRef.current).then((canvas) => {
       const link = document.createElement("a");
@@ -106,7 +64,6 @@ function DataForm() {
         <canvas ref={cardRef} width={300} height={400}></canvas>
       </div>
       <div className="form">
-        <input type="file" onChange={handleImageChange} />
         <input type="file" value={image} onChange={(e) => setImage(e.target.value)} />
         <input className="input" type="text" placeholder="Enter Text" value={text} onChange={(e) => setText(e.target.value)}/>
 
