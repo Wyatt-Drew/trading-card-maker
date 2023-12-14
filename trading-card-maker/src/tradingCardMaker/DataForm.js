@@ -19,7 +19,8 @@ const DataForm = () => {
       if (event.deltaY < 0) {
         setScale(prevScale => prevScale + 0.1);
       } else if (event.deltaY > 0) {
-        setScale(prevScale => prevScale - 0.1);
+        if (scale > 0.1){setScale(prevScale => prevScale - 0.1);}
+        
       }
     };
 
@@ -80,10 +81,16 @@ const DataForm = () => {
     const drawImages = (image, bgImg) => {
       const card = cardRef.current;
       const context = card.getContext('2d');
+      
       context.clearRect(0, 0, card.width, card.height);
       if (image) {
+        let drawHeight = image.height / (cardRef.current.offsetHeight /card.height);
+        let drawWidth = image.width / (cardRef.current.offsetWidth /card.width);
         context.drawImage(image, position.x, position.y, 
-          (card.width * scale), (card.height * scale));
+          (drawWidth * scale), (drawHeight * scale));
+          console.log("proportions");
+          console.log(cardRef.current.offsetWidth);
+          console.log(cardRef.current.offsetHeight);
       }
       context.drawImage(bgImg, 0, 0, card.width, card.height);
     };
