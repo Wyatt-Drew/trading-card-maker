@@ -4,7 +4,6 @@ import html2canvas from 'html2canvas';
 import './DownloadButton.css';
 import './DataForm.css';
 import '../App.css';
-import ReactScrollWheelHandler from 'react-scroll-wheel-handler';
 
 const DataForm = () => {
     const [image, setImage] = useState(null);
@@ -27,16 +26,16 @@ const DataForm = () => {
     const startDrag = (e) => {
       setIsDragging(true);
       setPrevPosition({
-        x: position.x,
-        y: position.y  
-    });
+        x: e.clientX - position.x,
+        y: e.clientY - position.y
+      });
       updatePosition(e);
   };
 
   const drag = (e) => {
-      if (isDragging) {
-          updatePosition(e);
-      }
+    if (isDragging) {
+        updatePosition(e);
+    }
   };
 
   const endDrag = () => {
@@ -44,14 +43,10 @@ const DataForm = () => {
   };
 
   const updatePosition = (e) => {
-      if (cardRef.current) {
-          const rect = cardRef.current.getBoundingClientRect();
-          setPosition({
-              x: e.clientX - rect.left + prevPosition.x,
-              y: e.clientY - rect.top  + prevPosition.y
-          });
-          
-      }
+    setPosition({
+      x: e.clientX - prevPosition.x,
+      y: e.clientY - prevPosition.y
+    });
   };
 
 
@@ -60,16 +55,17 @@ const DataForm = () => {
       if (file && file.type.startsWith('image/')) {
           const reader = new FileReader();
           reader.onload = (e) => {
-              const img = new Image();
-              img.onload = () => {
+              const image = new Image();
+              image.onload = () => {
                   const card = cardRef.current;
-                  card.width = img.width;
-                  card.height = img.height;
-                  const ctx = card.getContext('2d');
-                  ctx.drawImage(img, 0 + position.x, 0 + position.y, (card.width * scale) + position.x, (card.height * scale) + position.y);
+                  card.width = image.width;
+                  card.height = image.height;
+                  const context = card.getContext('2d');
+                  context.drawImage(image, position.x, position.y, card.width * scale, card.height * scale);
+                  //ctx.drawImage(img, 0 + position.x, 0 + position.y, (card.width * scale) + position.x, (card.height * scale) + position.y);
               };
-              img.src = e.target.result;
-              setImage(img);
+              image.src = e.target.result;
+              setImage(image);
           };
           reader.readAsDataURL(file);
       }
