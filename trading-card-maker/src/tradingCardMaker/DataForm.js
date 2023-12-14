@@ -74,40 +74,49 @@ const DataForm = () => {
       fileInputRef.current.click();
   };
 
-    useEffect(() => {
-        // Function to load an image
-        const loadImage = (src) => {
-          return new Promise((resolve, reject) => {
-            const img = new Image();
-            img.src = src;
-            img.onload = resolve;
-            img.onerror = reject;
-          });
-        };
-        // Load the images in sequence
-        const loadImagesInOrder = async () => {
-          const card = cardRef.current;
-          const context = card.getContext('2d');
-          try {
-            context.clearRect(0, 0, card.width, card.height);
-            if (image) {
-              context.drawImage(image, 0 + position.x, 0 + position.y, (card.width * scale) + position.x, (card.height * scale) + position.y);
-              console.log(card.width);
-            } 
-            await loadImage(backgroundImg);
-            // Draw background image on the canvas here
-            // Set the state to true when both images are loaded
-            const bgImg = new Image();
-            bgImg.src = backgroundImg;
-            bgImg.onload = () => {
-              context.drawImage(bgImg, 0, 0, card.width, card.height);
-            };
-          } catch (error) {
-            console.error("Error loading images", error);
-          }
-        };
-        loadImagesInOrder();
-      }, [backgroundImg, image, position,  scale]);
+  useEffect(() => {
+    // Function to load an image
+    const loadImage = (src) => {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.src = src;
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+      });
+    };
+
+    // Function to draw images on the canvas
+    const drawImages = (image, bgImg) => {
+      const card = cardRef.current;
+      const context = card.getContext('2d');
+      context.clearRect(0, 0, card.width, card.height);
+      
+      // Then draw the other image
+      if (image) {
+        context.drawImage(image, 0 + position.x, 0 + position.y, 
+          (card.width * scale) + position.x, (card.height * scale) + position.y);
+      }
+      // Draw background image first
+      context.drawImage(bgImg, 0, 0, card.width, card.height);
+    };
+
+    // Load the images concurrently and then draw them
+    const loadAndDrawImages = async () => {
+      try {
+        const [img, bgImg] = await Promise.all([
+          image ? loadImage(image.src) : null,
+          loadImage(backgroundImg)
+        ]);
+
+        drawImages(img, bgImg);
+      } catch (error) {
+        console.error("Error loading images", error);
+      }
+    };
+
+    loadAndDrawImages();
+  }, [backgroundImg, image, position, scale]);
+
     
     const handleDownloadClick = () => {
         html2canvas(cardRef.current).then((canvas) => {
