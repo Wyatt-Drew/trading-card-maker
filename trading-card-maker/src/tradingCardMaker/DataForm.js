@@ -49,21 +49,12 @@ const DataForm = () => {
     });
   };
 
-
     const handleImageUpload = (e) => {
       const file = e.target.files[0];
       if (file && file.type.startsWith('image/')) {
           const reader = new FileReader();
           reader.onload = (e) => {
               const image = new Image();
-              image.onload = () => {
-                  const card = cardRef.current;
-                  card.width = image.width;
-                  card.height = image.height;
-                  const context = card.getContext('2d');
-                  context.drawImage(image, position.x, position.y, card.width * scale, card.height * scale);
-                  //ctx.drawImage(img, 0 + position.x, 0 + position.y, (card.width * scale) + position.x, (card.height * scale) + position.y);
-              };
               image.src = e.target.result;
               setImage(image);
           };
@@ -90,13 +81,10 @@ const DataForm = () => {
       const card = cardRef.current;
       const context = card.getContext('2d');
       context.clearRect(0, 0, card.width, card.height);
-      
-      // Then draw the other image
       if (image) {
-        context.drawImage(image, 0 + position.x, 0 + position.y, 
-          (card.width * scale) + position.x, (card.height * scale) + position.y);
+        context.drawImage(image, position.x, position.y, 
+          (card.width * scale), (card.height * scale));
       }
-      // Draw background image first
       context.drawImage(bgImg, 0, 0, card.width, card.height);
     };
 
@@ -107,13 +95,11 @@ const DataForm = () => {
           image ? loadImage(image.src) : null,
           loadImage(backgroundImg)
         ]);
-
         drawImages(img, bgImg);
       } catch (error) {
         console.error("Error loading images", error);
       }
     };
-
     loadAndDrawImages();
   }, [backgroundImg, image, position, scale]);
 
