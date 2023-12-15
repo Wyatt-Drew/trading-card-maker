@@ -8,8 +8,8 @@
     margin: 0;
   }
   .card {
-    width: 600px;
-    height: 800px;
+    width: 480px;
+    height: 640px;
     background-color: #f0f0f0;
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -39,8 +39,8 @@
     z-index: 1000;
     padding: 20px;
     background-color: rgba(255, 255, 255, 0.3);
-    width: 700px;
-    height: 880px;
+    width: 560px;
+    height: 700px;
     color: white;
     /* text-align: center; */
     border-radius: 2px;
