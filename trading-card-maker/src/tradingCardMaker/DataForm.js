@@ -15,6 +15,9 @@ const DataForm = () => {
     const [prevPosition, setPrevPosition] = useState({ x: 0, y: 0 });
     const [scale, setScale] = useState(1);
 
+
+
+
     const handleWheel = (event) => {
       if (event.deltaY < 0) {
         setScale(prevScale => prevScale + 0.1);
@@ -66,6 +69,23 @@ const DataForm = () => {
       fileInputRef.current.click();
   };
 
+  // Function to calculate the best font size
+  const calculateFontSize = (ctx, text, maxWidth, maxHeight) => {
+    let fontSize = 20; // Start with a default font size
+    ctx.font = `${fontSize}px Arial`;
+
+    // Increase the font size until the text is too wide or too tall
+    while (ctx.measureText(text).width < maxWidth && fontSize < maxHeight) {
+      fontSize++;
+      ctx.font = `${fontSize}px Arial`;
+    }
+
+    // Decrease the font size slightly for a better fit
+    return fontSize - 1;
+  };
+
+
+
   useEffect(() => {
     // Function to load an image
     const loadImage = (src) => {
@@ -84,15 +104,23 @@ const DataForm = () => {
       
       context.clearRect(0, 0, card.width, card.height);
       if (image) {
-        let drawHeight = image.height / (cardRef.current.offsetHeight /card.height);
-        let drawWidth = image.width / (cardRef.current.offsetWidth /card.width);
+        let drawHeight = image.height / (card.offsetHeight /card.height);
+        let drawWidth = image.width / (card.offsetWidth /card.width);
         context.drawImage(image, position.x, position.y, 
           (drawWidth * scale), (drawHeight * scale));
-          console.log("proportions");
-          console.log(cardRef.current.offsetWidth);
-          console.log(cardRef.current.offsetHeight);
       }
       context.drawImage(bgImg, 0, 0, card.width, card.height);
+      // Set the font, align and baseline if necessary
+      context.font = '70px Arial';
+      context.textAlign = 'center';
+      context.textBaseline = 'middle';
+      context.fillStyle = 'white';
+
+      // Set the position and content of your text
+      const x = card.offsetWidth / 2;
+      const y = card.offsetHeight/16;
+      // Draw the text
+      context.fillText(text, x, y);
     };
 
     // Load the images concurrently and then draw them
@@ -108,7 +136,7 @@ const DataForm = () => {
       }
     };
     loadAndDrawImages();
-  }, [backgroundImg, image, position, scale]);
+  }, [backgroundImg, image, position, scale, text]);
 
     
     const handleDownloadClick = () => {
@@ -124,16 +152,14 @@ const DataForm = () => {
         <div className="container"
         onWheel={handleWheel}
         >
-
-        
             <div className="card" 
                 onMouseDown={startDrag} 
                 onMouseMove={drag} 
                 onMouseUp={endDrag} 
                 onMouseLeave={endDrag}
                 >
-
-                <canvas ref={cardRef} />
+                {/* Note: This absolutely must match Card size and must be inline css or it will be blurry */}
+                <canvas ref={cardRef} width="600" height="800"/>
             </div>
             <div className="form">
                 <input type="file" ref={fileInputRef} style={{ display: 'none' }} onChange={handleImageUpload}/>
