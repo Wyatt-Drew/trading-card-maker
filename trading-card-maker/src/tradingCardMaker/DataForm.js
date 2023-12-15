@@ -4,6 +4,7 @@ import html2canvas from 'html2canvas';
 import './DownloadButton.css';
 import './DataForm.css';
 import '../App.css';
+import UploadIcon from '@mui/icons-material/Upload';
 
 const DataForm = () => {
     const [image, setImage] = useState(null);
@@ -165,7 +166,7 @@ const DataForm = () => {
             </div>
             <div className="form">
               <input type="file" ref={fileInputRef} style={{ display: 'none' }} onChange={handleImageUpload}/>
-              <button onClick={handleFileInputClick}>Upload Image</button>
+              <button onClick={handleFileInputClick}><UploadIcon className = "dl-icon"/>Upload Image </button>
               <textarea value={text} onChange={handleTextChange} style={{ fontSize: `${textSize}px`}}/>
               <br />
               <label className = "numberInputLabel"> Text Size:&emsp;
