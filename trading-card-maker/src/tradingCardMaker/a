@@ -4,7 +4,6 @@ import html2canvas from 'html2canvas';
 import './DownloadButton.css';
 import './DataForm.css';
 import '../App.css';
-import ReactScrollWheelHandler from 'react-scroll-wheel-handler';
 
 const DataForm = () => {
     const [image, setImage] = useState(null);
@@ -16,31 +15,31 @@ const DataForm = () => {
     const [prevPosition, setPrevPosition] = useState({ x: 0, y: 0 });
     const [scale, setScale] = useState(1);
 
-    // Function to increment 'scale'
-    const handleScrollUp = () => {
-      setScale(prevScale => prevScale + 0.1);
-      console.log(scale);
+
+
+
+    const handleWheel = (event) => {
+      if (event.deltaY < 0) {
+        setScale(prevScale => prevScale + 0.1);
+      } else if (event.deltaY > 0) {
+        if (scale > 0.1){setScale(prevScale => prevScale - 0.1);}
+        
+      }
     };
-  
-    // Function to decrement 'scale'
-    const handleScrollDown = () => {
-      setScale(prevScale => prevScale - 0.1);
-      console.log(scale);
-    };
-    
+
     const startDrag = (e) => {
       setIsDragging(true);
       setPrevPosition({
-        x: position.x,
-        y: position.y  
-    });
+        x: e.clientX - position.x,
+        y: e.clientY - position.y
+      });
       updatePosition(e);
   };
 
   const drag = (e) => {
-      if (isDragging) {
-          updatePosition(e);
-      }
+    if (isDragging) {
+        updatePosition(e);
+    }
   };
 
   const endDrag = () => {
@@ -48,32 +47,20 @@ const DataForm = () => {
   };
 
   const updatePosition = (e) => {
-      if (cardRef.current) {
-          const rect = cardRef.current.getBoundingClientRect();
-          setPosition({
-              x: e.clientX - rect.left + prevPosition.x,
-              y: e.clientY - rect.top  + prevPosition.y
-          });
-          
-      }
+    setPosition({
+      x: e.clientX - prevPosition.x,
+      y: e.clientY - prevPosition.y
+    });
   };
-
 
     const handleImageUpload = (e) => {
       const file = e.target.files[0];
       if (file && file.type.startsWith('image/')) {
           const reader = new FileReader();
           reader.onload = (e) => {
-              const img = new Image();
-              img.onload = () => {
-                  const card = cardRef.current;
-                  card.width = img.width;
-                  card.height = img.height;
-                  const ctx = card.getContext('2d');
-                  ctx.drawImage(img, 0 + position.x, 0 + position.y, (card.width * scale) + position.x, (card.height * scale) + position.y);
-              };
-              img.src = e.target.result;
-              setImage(img);
+              const image = new Image();
+              image.src = e.target.result;
+              setImage(image);
           };
           reader.readAsDataURL(file);
       }
@@ -82,40 +69,107 @@ const DataForm = () => {
       fileInputRef.current.click();
   };
 
-    useEffect(() => {
-        // Function to load an image
-        const loadImage = (src) => {
-          return new Promise((resolve, reject) => {
-            const img = new Image();
-            img.src = src;
-            img.onload = resolve;
-            img.onerror = reject;
-          });
-        };
-        // Load the images in sequence
-        const loadImagesInOrder = async () => {
-          const card = cardRef.current;
-          const context = card.getContext('2d');
-          try {
-            context.clearRect(0, 0, card.width, card.height);
-            if (image) {
-              context.drawImage(image, 0 + position.x, 0 + position.y, (card.width * scale) + position.x, (card.height * scale) + position.y);
-              console.log(card.width);
-            } 
-            await loadImage(backgroundImg);
-            // Draw background image on the canvas here
-            // Set the state to true when both images are loaded
-            const bgImg = new Image();
-            bgImg.src = backgroundImg;
-            bgImg.onload = () => {
-              context.drawImage(bgImg, 0, 0, card.width, card.height);
-            };
-          } catch (error) {
-            console.error("Error loading images", error);
-          }
-        };
-        loadImagesInOrder();
-      }, [backgroundImg, image, position,  scale]);
+  // Function to calculate the best font size
+  const calculateFontSize = (ctx, text, maxWidth, maxHeight) => {
+    let fontSize = 20; // Start with a default font size
+    ctx.font = `${fontSize}px Arial`;
+
+    // Increase the font size until the text is too wide or too tall
+    while (ctx.measureText(text).width < maxWidth && fontSize < maxHeight) {
+      fontSize++;
+      ctx.font = `${fontSize}px Arial`;
+    }
+
+    // Decrease the font size slightly for a better fit
+    return fontSize - 1;
+  };
+
+  // Function to wrap text
+  const wrapText = (ctx, text, maxWidth) => {
+    const words = text.split(' ');
+    let lines = [];
+    let currentLine = words[0];
+
+    for (let i = 1; i < words.length; i++) {
+      const word = words[i];
+      const width = ctx.measureText(currentLine + " " + word).width;
+      if (width < maxWidth) {
+        currentLine += " " + word;
+      } else {
+        lines.push(currentLine);
+        currentLine = word;
+      }
+    }
+    lines.push(currentLine); // Push the last line
+    return lines;
+  };
+
+
+  useEffect(() => {
+    // Function to load an image
+    const loadImage = (src) => {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.src = src;
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+      });
+    };
+
+    // Function to draw images on the canvas
+    const drawImages = (image, bgImg) => {
+      const card = cardRef.current;
+      const context = card.getContext('2d');
+      
+      context.clearRect(0, 0, card.width, card.height);
+      if (image) {
+        let drawHeight = image.height / (card.offsetHeight /card.height);
+        let drawWidth = image.width / (card.offsetWidth /card.width);
+        context.drawImage(image, position.x, position.y, 
+          (drawWidth * scale), (drawHeight * scale));
+      }
+      context.drawImage(bgImg, 0, 0, card.width, card.height);
+      // Set the font, align and baseline if necessary
+      context.font = '70px Arial';
+      context.textAlign = 'center';
+      context.textBaseline = 'middle';
+      context.fillStyle = 'white';
+
+      const maxWidth = card.offsetWidth;
+      const maxHeight = card.offsetHeight/10;
+      // Calculate the best font size
+      const fontSize = calculateFontSize(context, text, maxWidth, maxHeight);
+      context.font = `${fontSize}px Arial`;
+
+       // Calculate the x and y position for centered text
+        // const textWidth = context.measureText(text).width;
+        // const xPosition = (card.offsetWidth - textWidth);
+        const lines = wrapText(context, text, maxWidth);
+        let yPosition = (maxHeight - (lines.length * 20)) / 2;
+        // Draw the text
+        lines.forEach(line => {
+          const textWidth = context.measureText(line).width;
+          const xPosition = (card.width - textWidth) / 2;
+          context.fillText(line, xPosition, yPosition);
+          yPosition += 20; // Move to next line
+        });
+    };
+
+    // Load the images concurrently and then draw them
+    const loadAndDrawImages = async () => {
+      try {
+        const [img, bgImg] = await Promise.all([
+          image ? loadImage(image.src) : null,
+          loadImage(backgroundImg)
+        ]);
+        drawImages(img, bgImg);
+      } catch (error) {
+        console.error("Error loading images", error);
+      }
+    };
+    loadAndDrawImages();
+  }, [backgroundImg, image, position, scale, text]);
+
     
     const handleDownloadClick = () => {
         html2canvas(cardRef.current).then((canvas) => {
@@ -125,30 +179,19 @@ const DataForm = () => {
           link.click();
         });
       };
-      const handleWheelEvent = () => {
-      };
 
     return (
-      <ReactScrollWheelHandler
-      upHandler={handleScrollUp}
-      downHandler={handleScrollDown}
-      timeout={0}
-      wheelConfig={[20, 300, 0.3]}//stability, sensitivity, tolerance
-      >
-        
         <div className="container"
-        
+        onWheel={handleWheel}
         >
-
-        
             <div className="card" 
                 onMouseDown={startDrag} 
                 onMouseMove={drag} 
                 onMouseUp={endDrag} 
                 onMouseLeave={endDrag}
                 >
-
-                <canvas ref={cardRef} />
+                {/* Note: This absolutely must match Card size and must be inline css or it will be blurry */}
+                <canvas ref={cardRef} width="600" height="800"/>
             </div>
             <div className="form">
                 <input type="file" ref={fileInputRef} style={{ display: 'none' }} onChange={handleImageUpload}/>
@@ -161,7 +204,6 @@ const DataForm = () => {
             </div>
 
         </div>
-        </ReactScrollWheelHandler>
     );
 };
 

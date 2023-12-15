@@ -9,12 +9,13 @@ const DataForm = () => {
     const [image, setImage] = useState(null);
     const cardRef = useRef(null);
     const fileInputRef = useRef(null);
-    const [text, setText] = useState("");
     const [isDragging, setIsDragging] = useState(false);
     const [position, setPosition] = useState({ x: 0, y: 0 });
     const [prevPosition, setPrevPosition] = useState({ x: 0, y: 0 });
     const [scale, setScale] = useState(1);
-
+    const [text, setText] = useState('');
+    const [textSize, setTextSize] = useState(16);
+    const [textColor, setTextColor] = useState('#000000');
 
 
 
@@ -69,42 +70,6 @@ const DataForm = () => {
       fileInputRef.current.click();
   };
 
-  // Function to calculate the best font size
-  const calculateFontSize = (ctx, text, maxWidth, maxHeight) => {
-    let fontSize = 20; // Start with a default font size
-    ctx.font = `${fontSize}px Arial`;
-
-    // Increase the font size until the text is too wide or too tall
-    while (ctx.measureText(text).width < maxWidth && fontSize < maxHeight) {
-      fontSize++;
-      ctx.font = `${fontSize}px Arial`;
-    }
-
-    // Decrease the font size slightly for a better fit
-    return fontSize - 1;
-  };
-
-  // Function to wrap text
-  const wrapText = (ctx, text, maxWidth) => {
-    const words = text.split(' ');
-    let lines = [];
-    let currentLine = words[0];
-
-    for (let i = 1; i < words.length; i++) {
-      const word = words[i];
-      const width = ctx.measureText(currentLine + " " + word).width;
-      if (width < maxWidth) {
-        currentLine += " " + word;
-      } else {
-        lines.push(currentLine);
-        currentLine = word;
-      }
-    }
-    lines.push(currentLine); // Push the last line
-    return lines;
-  };
-
-
   useEffect(() => {
     // Function to load an image
     const loadImage = (src) => {
@@ -129,30 +94,21 @@ const DataForm = () => {
           (drawWidth * scale), (drawHeight * scale));
       }
       context.drawImage(bgImg, 0, 0, card.width, card.height);
-      // Set the font, align and baseline if necessary
-      context.font = '70px Arial';
-      context.textAlign = 'center';
-      context.textBaseline = 'middle';
-      context.fillStyle = 'white';
 
       const maxWidth = card.offsetWidth;
       const maxHeight = card.offsetHeight/10;
-      // Calculate the best font size
-      const fontSize = calculateFontSize(context, text, maxWidth, maxHeight);
-      context.font = `${fontSize}px Arial`;
+       // Set text properties
+       context.font = `${textSize}px Arial`;
+       context.fillStyle = textColor;
+       // Handle line breaks and draw text
+       const lines = text.split('\n');
+       let yOffset = 0;
+       lines.forEach((line) => {
+           context.fillText(line, 10, 30 + yOffset); // Adjust x and y coordinates as needed
+           yOffset += parseInt(textSize, 10) + 5; 
+       });
 
-       // Calculate the x and y position for centered text
-        // const textWidth = context.measureText(text).width;
-        // const xPosition = (card.offsetWidth - textWidth);
-        const lines = wrapText(context, text, maxWidth);
-        let yPosition = (maxHeight - (lines.length * 20)) / 2;
-        // Draw the text
-        lines.forEach(line => {
-          const textWidth = context.measureText(line).width;
-          const xPosition = (card.width - textWidth) / 2;
-          context.fillText(line, xPosition, yPosition);
-          yPosition += 20; // Move to next line
-        });
+
     };
 
     // Load the images concurrently and then draw them
@@ -168,9 +124,19 @@ const DataForm = () => {
       }
     };
     loadAndDrawImages();
-  }, [backgroundImg, image, position, scale, text]);
+  }, [backgroundImg, image, position, scale, text, textSize, textColor]);
 
-    
+        const handleTextChange = (event) => {
+        setText(event.target.value);
+    };
+
+    const handleTextSizeChange = (event) => {
+        setTextSize(event.target.value);
+    };
+
+    const handleTextColorChange = (event) => {
+        setTextColor(event.target.value);
+    };
     const handleDownloadClick = () => {
         html2canvas(cardRef.current).then((canvas) => {
           const link = document.createElement("a");
@@ -196,7 +162,33 @@ const DataForm = () => {
             <div className="form">
                 <input type="file" ref={fileInputRef} style={{ display: 'none' }} onChange={handleImageUpload}/>
                 <button onClick={handleFileInputClick}>Upload Image</button>
-                <input className="input" type="text" placeholder="Enter Text" value={text} onChange={(e) => setText(e.target.value)}/>
+                <textarea
+                value={text}
+                onChange={handleTextChange}
+                style={{ fontSize: `${textSize}px`, color: textColor }}
+                rows="4"
+                cols="50"
+            ></textarea>
+            <br />
+            <label>
+                Text Size:
+                <input
+                    type="number"
+                    value={textSize}
+                    onChange={handleTextSizeChange}
+                />
+            </label>
+            <br />
+            <label>
+                Text Color:
+                <input
+                    type="color"
+                    value={textColor}
+                    onChange={handleTextColorChange}
+                />
+            </label>
+            <br />
+                {/* <input className="input" type="text" placeholder="Enter Text" value={text} onChange={(e) => setText(e.target.value)}/> */}
                 <button type="button" data-dl onClick={handleDownloadClick}>
                     <span className="dl-icon"></span>
                     <span>&#x44;&#x6F;&#x77;&#x6E;&#x6C;&#x6F;&#x61;&#x64;</span>
