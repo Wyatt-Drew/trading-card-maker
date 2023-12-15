@@ -1,0 +1,16 @@
+{
+  "files": {
+    "main.css": "/trading-card-maker/static/css/main.9d3113d2.css",
+    "main.js": "/trading-card-maker/static/js/main.6a53f502.js",
+    "static/js/787.763e2e1d.chunk.js": "/trading-card-maker/static/js/787.763e2e1d.chunk.js",
+    "static/media/minecraft_ducky_template.png": "/trading-card-maker/static/media/minecraft_ducky_template.185bb1861fa233a6e02e.png",
+    "index.html": "/trading-card-maker/index.html",
+    "main.9d3113d2.css.map": "/trading-card-maker/static/css/main.9d3113d2.css.map",
+    "main.6a53f502.js.map": "/trading-card-maker/static/js/main.6a53f502.js.map",
+    "787.763e2e1d.chunk.js.map": "/trading-card-maker/static/js/787.763e2e1d.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.9d3113d2.css",
+    "static/js/main.6a53f502.js"
+  ]
+}
