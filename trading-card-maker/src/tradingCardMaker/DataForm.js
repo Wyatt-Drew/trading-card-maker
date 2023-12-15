@@ -15,8 +15,8 @@ const DataForm = () => {
     const [scale, setScale] = useState(1);
     const [text, setText] = useState('');
     const [textSize, setTextSize] = useState(40);
-    const [textColor, setTextColor] = useState('white');
-    const [topMargin, setTopMargin] = useState(0);
+    const [textColor, setTextColor] = useState('#FFFFFF');
+    const [topMargin, setTopMargin] = useState(13);
 
 
 
@@ -101,8 +101,11 @@ const DataForm = () => {
        // Handle line breaks and draw text
        const lines = text.split('\n');
        let yOffset = 0 + topMargin;
+
        lines.forEach((line) => {
-           context.fillText(line, 10, 30 + yOffset); // Adjust x and y coordinates as needed
+          let textWidth = context.measureText(line).width;
+          let x = (card.width - textWidth) / 2
+           context.fillText(line, x, 30 + yOffset); 
            yOffset += parseInt(textSize, 10) + 5; 
        });
 
@@ -161,31 +164,31 @@ const DataForm = () => {
                 <canvas ref={cardRef} width="600" height="800"/>
             </div>
             <div className="form">
-                <input type="file" ref={fileInputRef} style={{ display: 'none' }} onChange={handleImageUpload}/>
-                <button onClick={handleFileInputClick}>Upload Image</button>
-                <textarea value={text} onChange={handleTextChange} style={{ fontSize: `${textSize}px`, color: textColor}}/>
-            <br />
-            <label> Text Size:
-                <input type="number" value={textSize} onChange={handleTextSizeChange} className = "textSize"/>
-            </label>
-            <br />
-            <label> Top Margin:
-                <input type="number" value={topMargin} onChange={handleTopMarginChange} className = "textSize"/>
-            </label>
-            <br />
-            <label>
-                Text Color:
-                <input
-                    type="color"
-                    value={textColor}
-                    onChange={handleTextColorChange}
-                />
-            </label>
-            <br />
-                <button type="button" data-dl onClick={handleDownloadClick}>
-                    <span className="dl-icon"></span>
-                    <span>&#x44;&#x6F;&#x77;&#x6E;&#x6C;&#x6F;&#x61;&#x64;</span>
-                </button>
+              <input type="file" ref={fileInputRef} style={{ display: 'none' }} onChange={handleImageUpload}/>
+              <button onClick={handleFileInputClick}>Upload Image</button>
+              <textarea value={text} onChange={handleTextChange} style={{ fontSize: `${textSize}px`}}/>
+              <br />
+              <label className = "numberInputLabel"> Text Size:&emsp;
+                  <input type="number" value={textSize} onChange={handleTextSizeChange} className = "numberInput"/>
+              </label>
+              <br />
+              <label className = "numberInputLabel"> Top Margin:&emsp;
+                  <input type="number" value={topMargin} onChange={handleTopMarginChange} className = "numberInput"/>
+              </label>
+              <br />
+              <label>
+                  Text Color:&emsp;
+                  <input
+                      type="color"
+                      value={textColor}
+                      onChange={handleTextColorChange}
+                  />
+              </label>
+              <br />
+              <button type="button" data-dl onClick={handleDownloadClick}>
+                  <span className="dl-icon"></span>
+                  <span>&#x44;&#x6F;&#x77;&#x6E;&#x6C;&#x6F;&#x61;&#x64;</span>
+              </button>
             </div>
 
         </div>
