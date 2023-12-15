@@ -84,6 +84,25 @@ const DataForm = () => {
     return fontSize - 1;
   };
 
+  // Function to wrap text
+  const wrapText = (ctx, text, maxWidth) => {
+    const words = text.split(' ');
+    let lines = [];
+    let currentLine = words[0];
+
+    for (let i = 1; i < words.length; i++) {
+      const word = words[i];
+      const width = ctx.measureText(currentLine + " " + word).width;
+      if (width < maxWidth) {
+        currentLine += " " + word;
+      } else {
+        lines.push(currentLine);
+        currentLine = word;
+      }
+    }
+    lines.push(currentLine); // Push the last line
+    return lines;
+  };
 
 
   useEffect(() => {
@@ -116,11 +135,24 @@ const DataForm = () => {
       context.textBaseline = 'middle';
       context.fillStyle = 'white';
 
-      // Set the position and content of your text
-      const x = card.offsetWidth / 2;
-      const y = card.offsetHeight/16;
-      // Draw the text
-      context.fillText(text, x, y);
+      const maxWidth = card.offsetWidth;
+      const maxHeight = card.offsetHeight/10;
+      // Calculate the best font size
+      const fontSize = calculateFontSize(context, text, maxWidth, maxHeight);
+      context.font = `${fontSize}px Arial`;
+
+       // Calculate the x and y position for centered text
+        // const textWidth = context.measureText(text).width;
+        // const xPosition = (card.offsetWidth - textWidth);
+        const lines = wrapText(context, text, maxWidth);
+        let yPosition = (maxHeight - (lines.length * 20)) / 2;
+        // Draw the text
+        lines.forEach(line => {
+          const textWidth = context.measureText(line).width;
+          const xPosition = (card.width - textWidth) / 2;
+          context.fillText(line, xPosition, yPosition);
+          yPosition += 20; // Move to next line
+        });
     };
 
     // Load the images concurrently and then draw them
