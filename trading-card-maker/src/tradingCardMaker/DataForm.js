@@ -14,8 +14,8 @@ const DataForm = () => {
     const [prevPosition, setPrevPosition] = useState({ x: 0, y: 0 });
     const [scale, setScale] = useState(1);
     const [text, setText] = useState('');
-    const [textSize, setTextSize] = useState(16);
-    const [textColor, setTextColor] = useState('#000000');
+    const [textSize, setTextSize] = useState(40);
+    const [textColor, setTextColor] = useState('white');
 
 
 
@@ -94,9 +94,6 @@ const DataForm = () => {
           (drawWidth * scale), (drawHeight * scale));
       }
       context.drawImage(bgImg, 0, 0, card.width, card.height);
-
-      const maxWidth = card.offsetWidth;
-      const maxHeight = card.offsetHeight/10;
        // Set text properties
        context.font = `${textSize}px Arial`;
        context.fillStyle = textColor;
@@ -162,21 +159,10 @@ const DataForm = () => {
             <div className="form">
                 <input type="file" ref={fileInputRef} style={{ display: 'none' }} onChange={handleImageUpload}/>
                 <button onClick={handleFileInputClick}>Upload Image</button>
-                <textarea
-                value={text}
-                onChange={handleTextChange}
-                style={{ fontSize: `${textSize}px`, color: textColor }}
-                rows="4"
-                cols="50"
-            ></textarea>
+                <textarea value={text} onChange={handleTextChange} style={{ fontSize: `${textSize}px`, color: textColor}}/>
             <br />
-            <label>
-                Text Size:
-                <input
-                    type="number"
-                    value={textSize}
-                    onChange={handleTextSizeChange}
-                />
+            <label> Text Size:
+                <input type="number" value={textSize} onChange={handleTextSizeChange} classname = "textInput"/>
             </label>
             <br />
             <label>

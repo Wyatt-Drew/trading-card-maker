@@ -48,7 +48,16 @@
     transition: opacity 0.3s ease-in 0.3s, visibility 0.3s ease-in 0.3s;
     transform: scale(0.9);
   }
-  
+  .form textarea{
+    resize: none;
+    width: 80%;
+    height: 40%;
+  }
+  .textInput{
+    font-size: 25px;
+    width: 50%;
+    height: 10%;
+  }
   .input {
     margin: 5px;
     width: 300px;
