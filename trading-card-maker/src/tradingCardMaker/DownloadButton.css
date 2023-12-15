@@ -35,6 +35,8 @@ button {
 	-moz-appearance: none;
 	appearance: none;
 	-webkit-tap-highlight-color: transparent;
+	margin-bottom: 5%;
+	margin-top: 5%;
 }
 button:focus {
 	outline: transparent;

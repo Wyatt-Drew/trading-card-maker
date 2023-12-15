@@ -39,8 +39,8 @@
     z-index: 1000;
     padding: 20px;
     background-color: rgba(255, 255, 255, 0.3);
-    height: 440px;
-    width: 400px;
+    width: 600px;
+    height: 600px;
     color: white;
     text-align: center;
     border-radius: 2px;
@@ -53,7 +53,7 @@
     width: 80%;
     height: 40%;
   }
-  .textInput{
+  .textSize{
     font-size: 25px;
     width: 50%;
     height: 10%;

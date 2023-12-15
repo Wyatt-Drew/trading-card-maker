@@ -16,6 +16,7 @@ const DataForm = () => {
     const [text, setText] = useState('');
     const [textSize, setTextSize] = useState(40);
     const [textColor, setTextColor] = useState('white');
+    const [topMargin, setTopMargin] = useState(0);
 
 
 
@@ -99,7 +100,7 @@ const DataForm = () => {
        context.fillStyle = textColor;
        // Handle line breaks and draw text
        const lines = text.split('\n');
-       let yOffset = 0;
+       let yOffset = 0 + topMargin;
        lines.forEach((line) => {
            context.fillText(line, 10, 30 + yOffset); // Adjust x and y coordinates as needed
            yOffset += parseInt(textSize, 10) + 5; 
@@ -121,7 +122,7 @@ const DataForm = () => {
       }
     };
     loadAndDrawImages();
-  }, [backgroundImg, image, position, scale, text, textSize, textColor]);
+  }, [backgroundImg, image, position, scale, text, textSize, textColor, topMargin]);
 
         const handleTextChange = (event) => {
         setText(event.target.value);
@@ -130,6 +131,9 @@ const DataForm = () => {
     const handleTextSizeChange = (event) => {
         setTextSize(event.target.value);
     };
+    const handleTopMarginChange = (event) => {
+      setTopMargin(Number(event.target.value));
+  };
 
     const handleTextColorChange = (event) => {
         setTextColor(event.target.value);
@@ -162,7 +166,11 @@ const DataForm = () => {
                 <textarea value={text} onChange={handleTextChange} style={{ fontSize: `${textSize}px`, color: textColor}}/>
             <br />
             <label> Text Size:
-                <input type="number" value={textSize} onChange={handleTextSizeChange} classname = "textInput"/>
+                <input type="number" value={textSize} onChange={handleTextSizeChange} className = "textSize"/>
+            </label>
+            <br />
+            <label> Top Margin:
+                <input type="number" value={topMargin} onChange={handleTopMarginChange} className = "textSize"/>
             </label>
             <br />
             <label>
@@ -174,7 +182,6 @@ const DataForm = () => {
                 />
             </label>
             <br />
-                {/* <input className="input" type="text" placeholder="Enter Text" value={text} onChange={(e) => setText(e.target.value)}/> */}
                 <button type="button" data-dl onClick={handleDownloadClick}>
                     <span className="dl-icon"></span>
                     <span>&#x44;&#x6F;&#x77;&#x6E;&#x6C;&#x6F;&#x61;&#x64;</span>
