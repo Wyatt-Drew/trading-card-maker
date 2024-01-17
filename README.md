@@ -3,6 +3,9 @@
 ## Overview
 Welcome to the Trading Card Maker for "The Rubber Ducky Academy," a unique tool designed for creating custom trading cards within our gaming Discord community. This React-based application lets users upload images, customize text, and download their personalized trading cards.
 
+## Deployment
+The application is deployed and accessible [here](https://wyatt-drew.github.io/trading-card-maker/).
+
 ## Features
 * Image Upload: Users can upload their own images to be featured on the trading cards.
 * Drag and Drop Positioning: Easily reposition your uploaded image on the canvas.
